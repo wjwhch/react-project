@@ -1,0 +1,4 @@
+.gridsBox{margin-top:25px;display: flex;justify-content: space-between;padding:0 5px}
+.gridsSmallBox{border:1px solid gray;border-radius: 5px;margin:0 3px;padding:5px;height:58px;width:58px}
+.gridsBox p{font:800 14px/1 "";margin:0;margin-top:3px}
+.gridsBox span{font-size:10px}

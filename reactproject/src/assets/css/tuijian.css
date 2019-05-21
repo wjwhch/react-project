@@ -1,0 +1,4 @@
+.tuijian{padding-bottom:52px;display: flex;flex-wrap:wrap;}
+.tjBox{width:45%;padding:5px}
+.tjUserBox{display: flex}
+.tjUserBox img{display:block;width:15px;height:15px;border-radius: 50%}
