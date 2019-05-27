@@ -3,13 +3,19 @@ import { Carousel, WingBlank } from 'antd-mobile';
 import axios from 'axios';
 import querystring from 'query-string'
 import '../assets/css/detail.css'
+import connect from 'react-redux/es/connect/connect'
+import {action3} from '../store/action'
 
 class Detail extends React.Component {
-    state = {
-      data:[], 
-    }
+    // constructor(){
+    //     super()
+    //     this.state={
+    //         data:[]
+    //     }
+    // }
+    
     render() {
-      let data = this.state.data
+      let data = this.props.detail
       console.log(data)
       return (
         <div className="Detail">
@@ -35,12 +41,12 @@ class Detail extends React.Component {
             {
                 data && data.map(val=>{
                     return(
-                        <div>
-                            <div key={val.id} className="detailAuthBox">
+                        <div key={val.id} >
+                            <div className="detailAuthBox">
                                 <img src={val.detail.auth_icon} className="detailAuthIcon"/>
                                 <div>
                                     <span>{val.detail.auth}</span>
-                                    <p><i>{val.time}</i><em></em></p>
+                                    <p><i>{this.date(val.time)}</i><em></em></p>
                                 </div>
                             </div>
                             <div className="detailAuthContent">
@@ -55,13 +61,27 @@ class Detail extends React.Component {
           
       );
     }
-    async componentDidMount(){
+    componentDidMount(){
         let id = this.props.match.params.id;
         let dataName = querystring.parse(this.props.location.search).dataName;
-        let res = await axios({url:`/mock/${dataName}/${id}`});
-        this.setState({data:new Array(res.data.page_data)})
-        console.log(this.state.data[0])
+        console.log(dataName)
+        // let res = await axios({url:`/mock/${dataName}/${id}`});
+        // this.setState({data:new Array(res.data.page_data)}) 
+        this.props.get({url:`/mock/${dataName}/${id}`,typename:'UPDATE_DETAIL'})
     }
   }
 
-export default Detail;
+  const initMapStateToProps=state=>({
+    detail:state.detail
+  });
+  
+  const initMapDispatchToProps=dispatch=>({
+    get:({url,params,typename})=>dispatch(action3({
+      dispatch,url,params,typename
+    }))
+  });
+  
+  export default connect(
+    initMapStateToProps,
+    initMapDispatchToProps
+  )(Detail)

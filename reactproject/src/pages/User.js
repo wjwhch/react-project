@@ -1,8 +1,9 @@
 import React,{Component} from "react";
 import '../assets/css/user.css'
+import connect from 'react-redux/es/connect/connect'
 class User extends Component {
   render() {
-    let {fans, follow, icon, nikename, time } = this.props.data;
+    let {fans, follow, icon, nikename, time } = this.props.user.page_data;
     return (
       <div id="content">
         <div id="header">
@@ -62,4 +63,15 @@ class User extends Component {
   }
 }
 
-export default User;
+const initMapStateToProps=state=>({
+  user: state.user
+});
+
+const initMapDispatchToProps=dispatch=>({
+  
+});
+
+export default connect(
+  initMapStateToProps,
+  initMapDispatchToProps
+)(User)

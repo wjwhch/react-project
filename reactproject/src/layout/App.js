@@ -3,6 +3,10 @@ import Header from './Header';
 import Footer from './Footer'
 import '../assets/css/app.css'
 
+import Loading from '../components/Loading'
+// import pubsub from 'pubsub-js';
+import connect from "react-redux/es/connect/connect";
+// import propTypes from "prop-types";
 import { Switch, Route, Redirect} from 'react-router-dom'
 import Home from "../pages/Home";
 import Follow from "../pages/Follow";
@@ -16,10 +20,59 @@ import AuthRoute from "../guard/Auth";
 
 
 class App extends React.Component {
+    //订阅
+    // pubsub.subscribe('update_loading',(messname,data)=>{
+      // console.log('订阅到')
+      // this.setState({bLoading:data})//可以
+      // this.state.bLoading=data;//不可以
+    // })
+ 
+  // setAppData = (bl)=>{
+  //   this.setState({appData:bl})
+  // }
+
+  // static childContextTypes={
+  //   setAppData : propTypes.func
+  // }
+
+  // getChildContext(){
+  //   return {
+  //     setAppData:this.setAppData
+  //   }
+  // }
+  
+  componentWillReceiveProps(nextProps){
+    let path = nextProps.location.pathname;
+    this.checkRoute(path);
+  }
+
+  componentDidMount(){
+    let path = this.props.location.pathname;
+    this.checkRoute(path);
+  }
+
+  checkRoute = (path) => {
+    let {viewHead,viewFoot} = this.props;
+    if (/home|follow|column/.test(path)){
+      // this.setState({bHead:true,bFoot:true})
+      viewHead(true);viewFoot(true);
+    }
+    if (/login|reg|detail/.test(path)){
+      // this.setState({bHead:false,bFoot:false})
+      viewHead(false);viewFoot(false);
+    }
+    if (/user/.test(path)){
+      // this.setState({bHead:false,bFoot:true})
+      viewHead(false);viewFoot(true);
+    }
+  };
+
   render(){
+    let {bHead,bFoot,bLoading} = this.props;
     return (
-      <div className="App">
-        <Header></Header>
+      <>
+        {bLoading && <Loading />}
+        {bHead && <Header/>}
         <Switch>
           <Route path="/home" component={Home}/>
           <Route path="/follow" component={Follow}/>
@@ -31,10 +84,26 @@ class App extends React.Component {
           <Redirect exact from="/" to="/home"/>
           <Route component={Error}/>
         </Switch>
-        <Footer></Footer>
-      </div>
+        {bFoot && <Footer/>}
+      </>
     );
   }
 }
 
-export default App;
+
+const initMapStateToProps=state=>({
+  bHead:state.bHead,
+  bFoot:state.bFoot,
+  bLoading:state.bLoading,
+});
+
+const initMapDispatchToProps=dispatch=>({
+  viewHead:(bl)=>dispatch({type:'VIEW_Head',payload:bl}),
+  viewFoot:(bl)=>dispatch({type:'VIEW_FOOT',payload:bl}),
+  viewLoading:(bl)=>dispatch({type:'VIEW_LOADING',payload:bl}),
+});
+
+export default connect(
+  initMapStateToProps,
+  initMapDispatchToProps
+)(App)

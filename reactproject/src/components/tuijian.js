@@ -2,15 +2,16 @@ import React from 'react';
 import axios from 'axios'
 import '../assets/css/tuijian.css'
 import {Link} from 'react-router-dom'
-
+import connect from "react-redux/es/connect/connect";
 import querystring from 'query-string'
+import {action3} from '../store/action'
+
 
 class Tuijian extends React.Component{
-    state={
-        data:[]
-    }
+
     render(){  
-        let data = this.state.data
+        let data = this.props.tuijian
+        console.log(data)
         return(
             <div className="tuijian">
                 {
@@ -35,10 +36,21 @@ class Tuijian extends React.Component{
             </div>
         )
     }
-    async componentDidMount(){
-        let res = await axios({url:`/mock/tuijian`});
-        console.log(res.data.page_data);
-        this.setState({data:res.data.page_data})
+    componentDidMount(){
+        this.props.get({url:'/mock/tuijian',typename:'UPDATE_TUIJIAN'})
     }
 }
-export default Tuijian;
+
+const initMapStateToProps=state=>({
+    tuijian:state.tuijian,
+});
+const initMapDispatchToProps=dispatch=>({
+    get:({url,params,typename})=>dispatch(action3({
+        dispatch,url,params,typename
+    }))
+});
+
+export default connect(
+    initMapStateToProps,
+    initMapDispatchToProps
+  )(Tuijian);

@@ -1,23 +1,41 @@
 import React from 'react'
-import { Carousel, WingBlank } from 'antd-mobile';
+import { Carousel } from 'antd-mobile';
 import '../assets/css/sliper.css'
-import axios from 'axios';
+// import axios from 'axios';
 import {Link} from 'react-router-dom'
+// import propTypes from "prop-types";
+// import pubsub from 'pubsub-js';
+import connect from 'react-redux/es/connect/connect'
+// import querystring from 'query-string'
+import {action1} from '../store/action'
 
 
 class Sliper extends React.Component {
-  async componentDidMount(){
-    let res = await axios({url:`/mock/nav`})
-    let newState=this.teamArr(res.data.page_data,10)
-    this.setState({data:newState})
+  // static contextTypes={
+  //   setAppData : propTypes.func
+  // }
+  
+  // async componentDidMount(){
+  //   // this.context.setAppData(true);
+  //   pubsub.publish('update_loading',true)
 
-  }
-  state={
-    data:[],
-    _limit:10
+  //   let res = await axios({url:`/mock/nav`})
+  //   let newState=this.teamArr(res.data.page_data,10)
+  //   this.setState({data:newState})
+  //   // this.context.setAppData(false);
+  //   pubsub.publish('update_loading',false)
+  // }
+
+  // state={
+  //   data:[],
+  //   _limit:10
+  // }
+  componentDidMount(){
+    // let dataName = querystring.parse(this.props.location.search).dataName;
+    this.props.get({url:`/mock/nav`,typename: 'UPDATE_NAV'})
   }
     render() {
-      let data = this.state.data
+      let data = this.props.data
         return ( 
               <Carousel className="sliper">
                 {data && data.map((item,index)=>{
@@ -38,17 +56,19 @@ class Sliper extends React.Component {
               </Carousel> 
         );
     }
-    toDetail(dataName,id){
-      this.props.history.push({pathname:'/column/'+id,search:'?dataName='+dataName})
-    }
-    teamArr(arr,num){
-      var l = arr.length;
-      var result=[];
-      for(var i=0;i<l;i+=num) {
-        result.push(arr.slice(i,i+num))
-      }
-      return result;
-    }
 }
 
-export default Sliper;
+const initMapStateToProps=state=>({
+  data:state.nav,
+});
+
+const initMapDispatchToProps=dispatch=>({
+  get:({url,params,typename})=>dispatch(action1({
+    dispatch,url,params,typename
+  }))
+});
+
+export default connect(
+  initMapStateToProps,
+  initMapDispatchToProps
+)(Sliper);

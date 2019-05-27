@@ -1,41 +1,60 @@
 import React,{Component} from "react";
 import '../assets/css/login.css'
 import {Link} from 'react-router-dom'
-import axios from 'axios';
+// import axios from 'axios';
+import {action2} from '../store/action'
+import connect from 'react-redux/es/connect/connect'
+
 class Login extends Component {
   state={
     username:'',
     password:'',
-    bl:false
-
+    bl:false 
   }
   changeIpt = (ev) => {
-    var exg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/
-    console.log(exg.test(ev.target.value))
-    if(!exg.test(ev.target.value)){
-      this.setState({bl:true})
-    }
+    // var exg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/
+    // console.log(exg.test(ev.target.value))
+    // if(!exg.test(ev.target.value)){
+    //   this.setState({bl:true})
+    // }
     this.setState({
       [ev.target.name]:ev.target.value
     })
   }
   submit = async () => {
-    let res = await axios({
+  //   let res = await axios({
+  //     url:'/mock/login',
+  //     params:{
+  //       username:this.state.username,
+  //       password:this.state.password
+  //     }
+  //   });
+
+    // console.log(res)
+    // if (res.data.error===0){
+    //   //写入local && 跳转user
+    //   localStorage.setItem('rc_user',JSON.stringify(res.data.page_data))
+    //   this.props.history.push('/user')
+    // } else {
+    //   alert('失败')
+    // }
+    this.props.get({
       url:'/mock/login',
       params:{
         username:this.state.username,
         password:this.state.password
+      },
+      typename:'UPDATE_USER'
+    }).then(
+      error => {
+        if(error === 0){
+          localStorage.setItem('rc_user',JSON.stringify(this.props.user))
+          this.props.history.push('/user')
+        }else{
+          alert(1)
+        }
       }
-    });
-
-    // console.log(res)
-    if (res.data.error===0){
-      //写入local && 跳转user
-      localStorage.setItem('rc_user',JSON.stringify(res.data.page_data))
-      this.props.history.push('/user')
-    } else {
-      alert('失败')
-    }
+    )
   }
   render() {
 
@@ -72,4 +91,17 @@ class Login extends Component {
   }
 }
 
-export default Login;
+const initMapStateToProps=state=>({
+  user:state.user
+});
+
+const initMapDispatchToProps=dispatch=>({
+  get:({url,params,typename})=>dispatch(action2({
+    url,params,typename
+  }))
+});
+
+export default connect(
+  initMapStateToProps,
+  initMapDispatchToProps
+)(Login)
